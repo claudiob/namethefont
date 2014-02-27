@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang='en' xmlns:ng="http://angularjs.org" ng-app>
+  <head>
+    <meta charset='utf-8'>
+    <title>Name the font</title>
+    <base href='akz/'>
+    <style>
+    body, input {text-align: center; font-family: monospace}
+    div {margin-bottom: 1em}
+    fieldset {border-width: 0}
+    img {vertical-align: middle; border: 1px solid silver}
+    .big img {width: 150px; height: 150px}
+    .small img {width: 25px; height: 25px; cursor: -webkit-zoom-in; cursor: -moz-zoom-in; cursor: zoom-in;}
+    .right {color: #0a0}
+    .wrong {color: #a00}
+    </style>
+  </head>
+  <body>
+    <div style="float: left; height: 100px; background: red">a</div>
+    <div style="float: right; height: 100px; background: red">a</div>
+    <div class='big'>
+      <img src='Aa.gif' id='big'>
+    </div>
+    <div class='small'>
+      <img src='Aa.gif' onclick='document.getElementById("big").src = "Aa.gif"'>
+      <img src='Bb.gif' onclick='document.getElementById("big").src = "Bb.gif"'>
+      <img src='Cc.gif' onclick='document.getElementById("big").src = "Cc.gif"'>
+      <img src='Dd.gif' onclick='document.getElementById("big").src = "Dd.gif"'>
+      <img src='Ee.gif' onclick='document.getElementById("big").src = "Ee.gif"'>
+    </div>
+    <div class='small'>
+      <img src='Ff.gif' onclick='document.getElementById("big").src = "Ff.gif"'>
+      <img src='Gg.gif' onclick='document.getElementById("big").src = "Gg.gif"'>
+      <img src='Hh.gif' onclick='document.getElementById("big").src = "Hh.gif"'>
+      <img src='Ii.gif' onclick='document.getElementById("big").src = "Ii.gif"'>
+      <img src='Jj.gif' onclick='document.getElementById("big").src = "Jj.gif"'>
+    </div>
+
+    <form name="signup_form">
+      <fieldset>
+        <label>Name the font:</label>
+        <input type="text" size='3' name="name" ng-model="signup.name" />
+
+        <div ng-show="signup_form.name.$viewValue.length == 3">
+          <div class='right' ng-show="signup_form.name.$viewValue == 'akz'">
+            Correct, it’s Akzidenz Grotesk! <br />
+          </div>
+
+          <div class='wrong' ng-hide="signup_form.name.$viewValue == 'akz'">
+            Wrong, it’s Akzidenz Grotesk! <br />
+          </div>
+
+          <button>Try another one</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <script src='../js/angular-1.0.3.min.js'></script>
+  </body>
+</html>
