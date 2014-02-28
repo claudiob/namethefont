@@ -1,60 +1,111 @@
 <!DOCTYPE html>
-<html lang='en' xmlns:ng="http://angularjs.org" ng-app>
+<html lang='en'>
   <head>
     <meta charset='utf-8'>
     <title>Name the font</title>
-    <base href='akz/'>
     <style>
     body, input {text-align: center; font-family: monospace}
     div {margin-bottom: 1em}
     fieldset {border-width: 0}
     img {vertical-align: middle; border: 1px solid silver}
-    .big img {width: 150px; height: 150px}
-    .small img {width: 25px; height: 25px; cursor: -webkit-zoom-in; cursor: -moz-zoom-in; cursor: zoom-in;}
-    .right {color: #0a0}
-    .wrong {color: #a00}
+    .big img {width: 180px; height: 180px}
+    .small img {width: 30px; height: 30px; margin-left: 3px; margin-right: 3px; cursor: -webkit-zoom-in; cursor: -moz-zoom-in; cursor: zoom-in;}
+    .outcome .right {color: #0a0}
+    .outcome .wrong {color: #a00}
+    .score .right {background-color: #0a0}
+    .score .wrong {background-color: #a00}
     </style>
   </head>
-  <body>
-    <div style="float: left; height: 100px; background: red">a</div>
-    <div style="float: right; height: 100px; background: red">a</div>
+  <body ng-app='hintPuzzle'>
+    <div class='score' style="float: left">
+      <div ng-repeat='puzzle in puzzles' ng-class='puzzle.outcome' style="width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0"></div>
+    </div>
+    <div class='timer' style='float: right'>
+      <div ng-repeat='puzzle in puzzles' ng-class='puzzle.outcome' style="width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0"></div>
+    </div>
     <div class='big'>
-      <img src='Aa.gif' id='big'>
+      <img ng-src='{{ puzzle.answer }}/{{ zoomedHint }}' id='big' />
+    </div>
+
+    <div class='small'>
+      <img ng-repeat='hint in puzzle.hints | limitTo:5' ng-src='{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
     </div>
     <div class='small'>
-      <img src='Aa.gif' onclick='document.getElementById("big").src = "Aa.gif"'>
-      <img src='Bb.gif' onclick='document.getElementById("big").src = "Bb.gif"'>
-      <img src='Cc.gif' onclick='document.getElementById("big").src = "Cc.gif"'>
-      <img src='Dd.gif' onclick='document.getElementById("big").src = "Dd.gif"'>
-      <img src='Ee.gif' onclick='document.getElementById("big").src = "Ee.gif"'>
-    </div>
-    <div class='small'>
-      <img src='Ff.gif' onclick='document.getElementById("big").src = "Ff.gif"'>
-      <img src='Gg.gif' onclick='document.getElementById("big").src = "Gg.gif"'>
-      <img src='Hh.gif' onclick='document.getElementById("big").src = "Hh.gif"'>
-      <img src='Ii.gif' onclick='document.getElementById("big").src = "Ii.gif"'>
-      <img src='Jj.gif' onclick='document.getElementById("big").src = "Jj.gif"'>
+      <img ng-repeat='hint in puzzle.hints | limitTo:-5' ng-src='{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
     </div>
 
     <form name="signup_form">
       <fieldset>
         <label>Name the font:</label>
-        <input type="text" size='3' name="name" ng-model="signup.name" />
-
-        <div ng-show="signup_form.name.$viewValue.length == 3">
-          <div class='right' ng-show="signup_form.name.$viewValue == 'akz'">
-            Correct, it’s Akzidenz Grotesk! <br />
-          </div>
-
-          <div class='wrong' ng-hide="signup_form.name.$viewValue == 'akz'">
-            Wrong, it’s Akzidenz Grotesk! <br />
-          </div>
-
-          <button>Try another one</button>
-        </div>
+        <input ng-model='guess' type='text' size='3' autofocus='autofocus' ng-change='verifyGuess()' ng-disabled='puzzle.outcome' />
       </fieldset>
     </form>
 
-    <script src='../js/angular-1.0.3.min.js'></script>
+    <div class='outcome' ng-show='puzzle.outcome'>
+      <div ng-class='puzzle.outcome' ng-switch on='puzzle.outcome'>
+        <span ng-switch-when='right'>Correct,</span>
+        <span ng-switch-when='wrong'>Wrong,</span>
+        it’s {{ puzzle.name }}! <br />
+      </div>
+      <button ng-click='nextPuzzle()' ng-show='puzzleIndex < puzzles.length - 1'>Try another one</button>
+      <div ng-click='nextPuzzle()' ng-show='puzzleIndex == puzzles.length - 1'>GAME OVER! :)</div>
+    </div>
+
+    <script src='js/angular-1.2.13.min.js'></script>
+    <script>
+    angular.module('hintPuzzle', []) // initialize the ng app
+      .run(function($rootScope) {
+        $rootScope.puzzles = [
+          {
+            name: 'Akzidenz Grotesk',
+            answer: 'akz',
+          },
+          {
+            name: 'Avenir',
+            answer: 'ave',
+          },
+          {
+            name: 'Helvetica',
+            answer: 'hel',
+          },
+        ];
+
+        $rootScope.hints = ['Aa.gif', 'Bb.gif', 'Cc.gif', 'Dd.gif', 'Ee.gif', 'Ff.gif', 'Gg.gif', 'Hh.gif',
+          'Ii.gif', 'Jj.gif', 'Kk.gif', 'Ll.gif', 'Mm.gif', 'Nn.gif', 'Oo.gif', 'Pp.gif', 'Qq.gif', 'Rr.gif',
+          'Ss.gif', 'Tt.gif', 'Uu.gif', 'Vv.gif', 'Ww.gif', 'Xx.gif', 'Yy.gif', 'Zz.gif', '12.gif', '34.gif',
+          '56.gif', '78.gif', '90.gif',
+          ];
+
+        $rootScope.shuffle = function(array){
+          for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+          return array;
+        };
+
+        $rootScope.puzzles = $rootScope.shuffle($rootScope.puzzles);
+        $rootScope.puzzleIndex = -1;
+
+        $rootScope.nextPuzzle = function() {
+          $rootScope.guess = '';
+          $rootScope.puzzleIndex += 1;
+          $rootScope.puzzle = $rootScope.puzzles[$rootScope.puzzleIndex];
+          $rootScope.puzzle.outcome = null;
+          $rootScope.puzzle.hints = $rootScope.shuffle($rootScope.hints);
+        }
+
+        $rootScope.nextPuzzle();
+
+        $rootScope.zoom = function(hint) {
+          $rootScope.zoomedHint = hint;
+        }
+
+        $rootScope.verifyGuess = function() {
+          if($rootScope.guess.length == 3) {
+            $rootScope.puzzle.outcome = ($rootScope.guess == $rootScope.puzzle.answer) ? 'right' : 'wrong'
+          }
+        }
+
+        $rootScope.zoom($rootScope.hints[0]);
+      });
+    </script>
   </body>
 </html>
