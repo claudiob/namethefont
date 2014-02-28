@@ -25,14 +25,14 @@
       <div ng-repeat='puzzle in puzzles' ng-class='puzzle.outcome' style="width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0"></div>
     </div>
     <div class='big'>
-      <img ng-src='{{ puzzle.answer }}/{{ zoomedHint }}' id='big' />
+      <img ng-src='fonts/{{ puzzle.answer }}/{{ zoomedHint }}' id='big' />
     </div>
 
     <div class='small'>
-      <img ng-repeat='hint in puzzle.hints | limitTo:5' ng-src='{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
+      <img ng-repeat='hint in puzzle.hints | limitTo:5' ng-src='fonts/{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
     </div>
     <div class='small'>
-      <img ng-repeat='hint in puzzle.hints | limitTo:-5' ng-src='{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
+      <img ng-repeat='hint in puzzle.hints | limitTo:-5' ng-src='fonts/{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
     </div>
 
     <form name="signup_form">
@@ -59,14 +59,181 @@
         $rootScope.puzzles = [
           {
             name: 'Akzidenz Grotesk',
+            publisher: 'Berthold',
+            year: 1896,
+            designer: 'Günter Gerhard Lange',
+            style: 'Std Regular',
             answer: 'akz',
           },
           {
+
+            name: 'American Typewriter',
+            publisher: 'ITC',
+            year: 1974,
+            designer: 'Joel Kaden and Tony Stan',
+            style: 'Std Medium',
+            answer: 'ame',
+          },
+          {
+            name: 'Avant Garde Gothic',
+            publisher: 'ITC',
+            year: 1974,
+            designer: 'Herb Lubalin and Tom Carnase',
+            style: 'Std Medium',
+            answer: 'ava',
+          },
+          {
+            name: 'Antique Olive',
+            publisher: 'Linotype',
+            year: 1962,
+            designer: 'Roger Excoffon',
+            style: 'Roman',
+            answer: 'ant',
+          },
+          {
+            name: 'Arial',
+            publisher: 'Monotype',
+            year: 1982,
+            designer: 'Robin Nicholas and Patricia Saunders',
+            style: 'Std Regular',
+            answer: 'ari',
+          },
+          {
             name: 'Avenir',
+            publisher: 'Linotype',
+            year: 1988,
+            designer: 'Adrian Frutiger',
+            style: '55 Roman',
             answer: 'ave',
           },
           {
+            name: 'Bank Gothic',
+            publisher: 'Bitstream',
+            year: 1930,
+            designer: 'Morris Fuller Benton',
+            style: '55 Roman',
+            answer: 'ban',
+          },
+          {
+            name: 'Baskerville',
+            publisher: 'Bitstream',
+            year: 1757,
+            designer: 'John Baskerville',
+            style: 'Roman',
+            answer: 'bas',
+          },
+          {
+            name: 'Bodoni',
+            publisher: 'Linotype',
+            year: 1767,
+            designer: 'Giambattista Bodoni',
+            style: 'Roman',
+            answer: 'bod',
+          },
+          {
+            name: 'Brandon Grotesque',
+            publisher: 'HVD Fonts',
+            year: 2009,
+            designer: 'Hannes von Döhren',
+            style: 'Regular',
+            answer: 'bra',
+          },
+          {
+            name: 'Caslon',
+            publisher: 'Linotype',
+            year: 1725,
+            designer: 'William Caslon',
+            style: 'Regular',
+            answer: 'cas',
+          },
+          {
+            name: 'Century Gothic',
+            publisher: 'Monotype',
+            year: 1959,
+            designer: 'Sol Hess',
+            // NOTE: Sol Hess created 20th century in 1959
+            // but Morris Fuller Benton adapted to Century Gothic in 1990
+            style: 'Std Regular',
+            answer: 'cen',
+          },
+          {
+            name: 'Clarendon',
+            publisher: 'Bitstream',
+            year: 1845,
+            designer: 'Edouard Hoffmann and Hermann Eidenbenz',
+            style: '',
+            answer: 'cla',
+          },
+          {
+            name: 'Comic Sans',
+            publisher: 'Ascender',
+            year: 1995,
+            designer: 'Vincent Connare',
+            style: '',
+            answer: 'com',
+          },
+          {
+            name: 'Cooper Black',
+            publisher: 'Linotype',
+            year: 1922,
+            designer: 'Oswald Bruce Cooper',
+            style: '',
+            answer: 'coo',
+          },
+          {
+            name: 'Copperplate Gothic',
+            publisher: 'Bitstream',
+            year: 1905,
+            designer: 'Frederic W. Goudy',
+            style: '',
+            answer: 'cop',
+          },
+          {
+            name: 'Dax',
+            publisher: 'FontFont',
+            year: 1995,
+            designer: 'Hans Reichel',
+            style: 'FF Dax Pro Regular',
+            answer: 'dax',
+          },
+          {
+            name: 'Didot',
+            publisher: 'Adobe',
+            year: 1783,
+            designer: 'Firmin Didot',
+            style: 'LT Std Roman',
+            answer: 'did',
+          },
+          {
+            name: 'Din',
+            publisher: 'FontFont',
+            year: 1995,
+            designer: 'Albert-Jan Pool',
+            style: 'FF Din Pro',
+            answer: 'din',
+          },
+          {
+            name: 'Eurostile',
+            publisher: 'Linotype',
+            year: 1962,
+            designer: 'Aldo Novarese',
+            style: '',
+            answer: 'eur',
+          },
+          {
+            name: 'Franklin Gothic',
+            publisher: 'URW++',
+            year: 1902,
+            designer: 'Morris Fuller Benton',
+            style: 'Medium',
+            answer: 'fra',
+          },
+          {
             name: 'Helvetica',
+            publisher: 'Adobe',
+            year: 1957,
+            designer: 'Max Miedinger',
+            style: 'Roman',
             answer: 'hel',
           },
         ];
