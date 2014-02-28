@@ -1,3 +1,4 @@
+* Make answer case-insensitive
 * Add a timer on the right
 * Show the result when the game is over
 * Reveal hints one at the time
