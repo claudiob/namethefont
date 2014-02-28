@@ -2,6 +2,7 @@
 <html lang='en'>
   <head>
     <meta charset='utf-8'>
+    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
     <title>Name the font</title>
     <style>
     body, input {text-align: center; font-family: monospace}
@@ -37,7 +38,7 @@
     <form name="signup_form">
       <fieldset>
         <label>Name the font:</label>
-        <input ng-model='guess' type='text' size='3' autofocus='autofocus' ng-change='verifyGuess()' ng-disabled='puzzle.outcome' />
+        <input ng-model='guess' type='text' size='3' autofocus='autofocus' ng-change='verifyGuess()' ng-disabled='puzzle.outcome' autocorrect='off' autocapitalize='off' />
       </fieldset>
     </form>
 
