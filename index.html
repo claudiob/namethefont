@@ -1,487 +1,94 @@
 <!DOCTYPE html>
 <html lang='en'>
-  <head>
-    <meta charset='utf-8'>
-    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
-    <title>Name the font</title>
-    <style>
+<head>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
+  <title>Name the font</title>
+  <style>
     body, input {text-align: center; font-family: monospace}
     div {margin-bottom: 1em}
     fieldset {border-width: 0}
-    img {vertical-align: middle; border: 1px solid silver}
+    img {vertical-align: middle; border: 1px solid #ddd}
     .big img {width: 180px; height: 180px}
     .small img {width: 30px; height: 30px; margin-left: 3px; margin-right: 3px; cursor: -webkit-zoom-in; cursor: -moz-zoom-in; cursor: zoom-in;}
-    .outcome .right {color: #0a0}
-    .outcome .wrong {color: #a00}
+    .small img:hover, .small img:focus {border-color: #aaa}
+    .small img.active, .big img {border-color: #777;}
+    .outcome.right {color: #0a0}
+    .outcome.wrong {color: #a00}
+    .score {float: left}
+    .timer {float: right}
     .score .right {background-color: #0a0}
     .score .wrong {background-color: #a00}
-    </style>
-  </head>
-  <body ng-app='hintPuzzle'>
-    <div class='score' style="float: left">
-      <div ng-repeat='puzzle in puzzles' ng-class='puzzle.outcome' style="width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0"></div>
+    .timer .ticked {background-color: #ccc}
+    .score div, .timer div  {width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0}
+    [ng-cloak] {display: none !important;}
+    .animate-show, .animate-hide {
+      -webkit-transition: opacity 1s ease-in-out;
+      -moz-transition: opacity 1s ease-in-out;
+      -ms-transition: opacity 1s ease-in-out;
+      -o-transition: opacity 1s ease-in-out;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .my-repeat-animation.ng-enter.ng-enter-active,
+    .my-repeat-animation.ng-leave {
+      opacity: 1;
+      -webkit-transition: opacity 300ms linear;
+      -moz-transition: opacity 300ms linear;
+      transition: opacity 300ms linear;
+    }
+
+    /* Remove animation */
+    .my-repeat-animation.ng-leave.ng-leave-active,
+    .my-repeat-animation.ng-enter {
+      opacity: 0;
+      -webkit-transition: opacity 300ms linear;
+      -moz-transition: opacity 300ms linear;
+      transition: opacity 300ms linear;
+    }
+  </style>
+</head>
+<body ng-app="quizApp" ng-controller="QuizCtrl">
+  <div class='score'>
+    <div ng-repeat='quiz in quizzes' ng-class='{right: isRight(quiz), wrong: isWrong(quiz)}'></div>
+  </div>
+  <div class='timer'>
+    <div ng-repeat='t in ticks() track by $index' ng-class='{ticked: $index < tick}'></div>
+  </div>
+
+  <div class='big' class="my-repeat-animation">
+    <img src="hints/blank.gif" ng-src='{{ quiz.hint }}' id='big'/>
+  </div>
+
+  <div class='small'>
+    <img src="hints/blank.gif" ng-repeat='hint in hints | limitTo:hints.length/2' ng-src='{{ hint }}' ng-click='selectHint(hint)' ng-class='{active: hint == quiz.hint}' />
+  </div>
+  <div class='small'>
+    <img src="hints/blank.gif" ng-repeat='hint in hints | limitTo:-hints.length/2' ng-src='{{ hint }}' ng-click='selectHint(hint)' ng-class='{active: hint == quiz.hint}' />
+  </div>
+
+  <form>
+    <label>
+      Name the font:
+      <input type="text" autofocus ng-model="guess" ng-disabled="isGuessed(quiz)" size="3" />
+    </label>
+
+    <div class="outcome" ng-show="isGuessed(quiz)" ng-cloak ng-class='{right: isRight(quiz), wrong: isWrong(quiz)}'>
+      <span ng-if='isRight(quiz)'>Correct,</span>
+      <span ng-if='isWrong(quiz)'>Wrong,</span>
+      it’s {{ quiz.name }}! <br />
     </div>
-    <div class='timer' style='float: right'>
-      <div ng-repeat='puzzle in puzzles' ng-class='puzzle.outcome' style="width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0"></div>
-    </div>
-    <div class='big'>
-      <img ng-src='fonts/{{ puzzle.answer }}/{{ zoomedHint }}' id='big' />
-    </div>
 
-    <div class='small'>
-      <img ng-repeat='hint in puzzle.hints | limitTo:5' ng-src='fonts/{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
-    </div>
-    <div class='small'>
-      <img ng-repeat='hint in puzzle.hints | limitTo:-5' ng-src='fonts/{{ puzzle.answer }}/{{ hint }}' ng-click='zoom(hint)' />
-    </div>
+    <input type="submit" ng-cloak ng-show="isGuessed(quiz) && !quizzes.over()" ng-click='quizzes.next()' value="Try another one" />
+    <div ng-cloak ng-show="isGuessed(quiz) && quizzes.over()">GAME OVER! :)</div>
+  </form>
 
-    <form name="signup_form">
-      <fieldset>
-        <label>Name the font:</label>
-        <input ng-model='guess' type='text' size='3' autofocus='autofocus' ng-change='verifyGuess()' ng-disabled='puzzle.outcome' autocorrect='off' autocapitalize='off' />
-      </fieldset>
-    </form>
-
-    <div class='outcome' ng-show='puzzle.outcome'>
-      <div ng-class='puzzle.outcome' ng-switch on='puzzle.outcome'>
-        <span ng-switch-when='right'>Correct,</span>
-        <span ng-switch-when='wrong'>Wrong,</span>
-        it’s {{ puzzle.name }}! <br />
-      </div>
-      <button ng-click='nextPuzzle()' ng-show='puzzleIndex < puzzles.length - 1'>Try another one</button>
-      <div ng-click='nextPuzzle()' ng-show='puzzleIndex == puzzles.length - 1'>GAME OVER! :)</div>
-    </div>
-
-    <script src='js/angular-1.2.13.min.js'></script>
-    <script>
-    angular.module('hintPuzzle', []) // initialize the ng app
-      .run(function($rootScope) {
-        $rootScope.puzzles = [
-          {
-            name: 'Akzidenz Grotesk',
-            publisher: 'Berthold',
-            year: 1896,
-            designer: 'Günter Gerhard Lange',
-            style: 'Std Regular',
-            answer: 'akz',
-          },
-          {
-
-            name: 'American Typewriter',
-            publisher: 'ITC',
-            year: 1974,
-            designer: 'Joel Kaden and Tony Stan',
-            style: 'Std Medium',
-            answer: 'ame',
-          },
-          {
-            name: 'Avant Garde Gothic',
-            publisher: 'ITC',
-            year: 1974,
-            designer: 'Herb Lubalin and Tom Carnase',
-            style: 'Std Book',
-            answer: 'ava',
-          },
-          {
-            name: 'Antique Olive',
-            publisher: 'Linotype',
-            year: 1962,
-            designer: 'Roger Excoffon',
-            style: 'Roman',
-            answer: 'ant',
-          },
-          {
-            name: 'Arial',
-            publisher: 'Monotype',
-            year: 1982,
-            designer: 'Robin Nicholas and Patricia Saunders',
-            style: 'Std Regular',
-            answer: 'ari',
-          },
-          {
-            name: 'Archer',
-            publisher: 'Hoefler & Frere-Jones',
-            year: 2007,
-            designer: 'Jonathan Hoefler and Tobias Frere-Jones',
-            style: 'Book',
-            answer: 'arc',
-          },
-          {
-            name: 'Avenir',
-            publisher: 'Linotype',
-            year: 1988,
-            designer: 'Adrian Frutiger',
-            style: '55 Roman',
-            answer: 'ave',
-          },
-          {
-            name: 'Bank Gothic',
-            publisher: 'Bitstream',
-            year: 1930,
-            designer: 'Morris Fuller Benton',
-            style: '55 Roman',
-            answer: 'ban',
-          },
-          {
-            name: 'Baskerville',
-            publisher: 'Bitstream',
-            year: 1757,
-            designer: 'John Baskerville',
-            style: 'Roman',
-            answer: 'bas',
-          },
-          {
-            name: 'Bodoni',
-            publisher: 'Linotype',
-            year: 1767,
-            designer: 'Giambattista Bodoni',
-            style: 'Roman',
-            answer: 'bod',
-          },
-          {
-            name: 'Brandon Grotesque',
-            publisher: 'HVD Fonts',
-            year: 2009,
-            designer: 'Hannes von Döhren',
-            style: 'Regular',
-            answer: 'bra',
-          },
-          {
-            name: 'Caslon',
-            publisher: 'Linotype',
-            year: 1725,
-            designer: 'William Caslon',
-            style: 'Regular',
-            answer: 'cas',
-          },
-          {
-            name: 'Century Gothic',
-            publisher: 'Monotype',
-            year: 1959,
-            designer: 'Sol Hess',
-            // NOTE: Sol Hess created 20th century in 1959
-            // but Morris Fuller Benton adapted to Century Gothic in 1990
-            style: 'Std Regular',
-            answer: 'cen',
-          },
-          {
-            name: 'Clarendon',
-            publisher: 'Bitstream',
-            year: 1845,
-            designer: 'Edouard Hoffmann and Hermann Eidenbenz',
-            style: '',
-            answer: 'cla',
-          },
-          {
-            name: 'Comic Sans',
-            publisher: 'Ascender',
-            year: 1995,
-            designer: 'Vincent Connare',
-            style: '',
-            answer: 'com',
-          },
-          {
-            name: 'Cooper Black',
-            publisher: 'Linotype',
-            year: 1922,
-            designer: 'Oswald Bruce Cooper',
-            style: '',
-            answer: 'coo',
-          },
-          {
-            name: 'Copperplate Gothic',
-            publisher: 'Bitstream',
-            year: 1905,
-            designer: 'Frederic W. Goudy',
-            style: '',
-            answer: 'cop',
-          },
-          {
-            name: 'Dax',
-            publisher: 'FontFont',
-            year: 1995,
-            designer: 'Hans Reichel',
-            style: 'FF Dax Pro Regular',
-            answer: 'dax',
-          },
-          {
-            name: 'Didot',
-            publisher: 'Adobe',
-            year: 1783,
-            designer: 'Firmin Didot',
-            style: 'LT Std Roman',
-            answer: 'did',
-          },
-          {
-            name: 'Din',
-            publisher: 'FontFont',
-            year: 1995,
-            designer: 'Albert-Jan Pool',
-            style: 'FF Din Pro',
-            answer: 'din',
-          },
-          {
-            name: 'Eurostile',
-            publisher: 'Linotype',
-            year: 1962,
-            designer: 'Aldo Novarese',
-            style: '',
-            answer: 'eur',
-          },
-          {
-            name: 'Franklin Gothic',
-            publisher: 'ITC',
-            year: 1902,
-            designer: 'Morris Fuller Benton',
-            style: 'Std Book',
-            answer: 'fra',
-          },
-          {
-            name: 'Frutiger',
-            publisher: 'URW++',
-            year: 1968,
-            designer: 'Adrian Frutiger',
-            style: '55 Roman',
-            answer: 'fru',
-          },
-          {
-            name: 'Futura',
-            publisher: 'Linotype',
-            year: 1932,
-            designer: 'Paul Renner',
-            style: 'Medium',
-            answer: 'fut',
-          },
-          {
-            name: 'Garamond',
-            publisher: 'Linotype',
-            year: 1495,
-            designer: 'Claude Garamond',
-            style: 'Adobe Garamond Regular',
-            answer: 'gar',
-          },
-          {
-            name: 'Georgia',
-            publisher: 'Ascender',
-            year: 1996,
-            designer: 'Matthew Carter',
-            style: '',
-            answer: 'geo',
-          },
-          {
-            name: 'Gill Sans',
-            publisher: 'Monotype',
-            year: 1928,
-            designer: 'Eric Gill',
-            style: '',
-            answer: 'gil',
-          },
-          {
-            name: 'Gotham',
-            publisher: 'Hoefler & Frere-Jones',
-            year: 2000,
-            designer: 'Jonathan Hoefler and Tobias Frere-Jones',
-            style: 'Book',
-            answer: 'got',
-          },
-          {
-            name: 'Helvetica',
-            publisher: 'Adobe',
-            year: 1957,
-            designer: 'Max Miedinger',
-            style: 'Roman',
-            answer: 'hel',
-          },
-          {
-            name: 'Interstate',
-            publisher: 'Font Bureau',
-            year: 1993,
-            designer: 'Tobias Frere-Jones',
-            style: 'Regular',
-            answer: 'int',
-          },
-          {
-            name: 'Johnston',
-            publisher: 'P22',
-            year: 1916,
-            designer: 'Edward Johnston',
-            style: 'P22 Johnston Underground',
-            answer: 'joh',
-          },
-          {
-            name: 'Kabel',
-            publisher: 'Linotype',
-            year: 1928,
-            designer: 'Rudolf Koch',
-            style: 'Book',
-            answer: 'kab',
-          },
-          {
-            name: 'Lucida Sans',
-            publisher: 'Adobe',
-            year: 1985,
-            designer: 'Charles Bigelow and Kris Holmes',
-            style: 'Roman',
-            answer: 'luc',
-          },
-          {
-            name: 'Minion',
-            publisher: 'Adobe',
-            year: 1990,
-            designer: 'Robert Slimbach',
-            style: 'Pro Regular',
-            answer: 'min',
-          },
-          {
-            name: 'Mistral',
-            publisher: 'Adobe',
-            year: 1953,
-            designer: 'Roger Excoffon',
-            style: 'Std',
-            answer: 'mis',
-          },
-          {
-            name: 'Museo',
-            publisher: 'exljbris',
-            year: 2008,
-            designer: 'Jos Buivenga',
-            style: '300',
-            answer: 'mus',
-          },
-          {
-            name: 'Myriad',
-            publisher: 'Adobe',
-            year: 1992,
-            designer: 'Robert Slimbach',
-            style: 'Pro Regular',
-            answer: 'myr',
-          },
-          {
-            name: 'News Gothic',
-            publisher: 'Adobe',
-            year: 1908,
-            designer: 'Morris Fuller Benton',
-            style: 'Pro Regular',
-            answer: 'new',
-          },
-          {
-            name: 'Optima',
-            publisher: 'Linotype',
-            year: 1958,
-            designer: 'Hermann Zapf',
-            style: '',
-            answer: 'opt',
-          },
-          {
-            name: 'Palatino',
-            publisher: 'Linotype',
-            year: 1986,
-            designer: 'Hermann Zapf',
-            style: 'Roman',
-            answer: 'pal',
-          },
-          {
-            name: 'Proxima Nova',
-            publisher: 'Mark Simonson',
-            year: 2005,
-            designer: 'Mark Simonson',
-            style: 'Regular',
-            answer: 'pro',
-          },
-          {
-            name: 'Rockwell',
-            publisher: 'Monotype',
-            year: 1934,
-            designer: 'Frank Hinman Pierpont',
-            style: 'Std',
-            answer: 'roc',
-          },
-          {
-            name: 'Rotis',
-            publisher: 'Monotype',
-            year: 1988,
-            designer: 'Otl Aicher',
-            style: 'Sans Serif',
-            answer: 'rot',
-          },
-          {
-            name: 'Times New Roman',
-            publisher: 'Monotype',
-            year: 1931,
-            designer: 'Victor Lardent',
-            style: 'Std Regular',
-            answer: 'tim',
-          },
-          {
-            name: 'Trade Gothic',
-            publisher: 'Linotype',
-            year: 1948,
-            designer: 'Jackson Burke',
-            style: '',
-            answer: 'tra',
-          },
-          {
-            name: 'Univers',
-            publisher: 'Linotype',
-            year: 1957,
-            designer: 'Adrian Frutiger',
-            style: '55 Roman',
-            answer: 'uni',
-          },
-          {
-            name: 'Verdana',
-            publisher: 'Ascender',
-            year: 1996,
-            designer: 'Matthew Carter',
-            style: '',
-            answer: 'ver',
-          },
-          // TO ADD (after name conflicts) with Frankfurter and VAG Rounded
-          // {
-          //   name: 'Trajan',
-          //   publisher: 'Adobe',
-          //   year: 1989,
-          //   designer: 'Carol Twombly',
-          //   style: 'Pro',
-          //   answer: 'tra',
-          // },
-        ];
-
-        $rootScope.hints = ['Aa.gif', 'Bb.gif', 'Cc.gif', 'Dd.gif', 'Ee.gif', 'Ff.gif', 'Gg.gif', 'Hh.gif',
-          'Ii.gif', 'Jj.gif', 'Kk.gif', 'Ll.gif', 'Mm.gif', 'Nn.gif', 'Oo.gif', 'Pp.gif', 'Qq.gif', 'Rr.gif',
-          'Ss.gif', 'Tt.gif', 'Uu.gif', 'Vv.gif', 'Ww.gif', 'Xx.gif', 'Yy.gif', 'Zz.gif', '12.gif', '34.gif',
-          '56.gif', '78.gif', '90.gif',
-          ];
-
-        $rootScope.shuffle = function(array){
-          for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
-          return array;
-        };
-
-        $rootScope.puzzles = $rootScope.shuffle($rootScope.puzzles);
-        $rootScope.puzzleIndex = -1;
-
-        $rootScope.nextPuzzle = function() {
-          $rootScope.guess = '';
-          $rootScope.puzzleIndex += 1;
-          $rootScope.puzzle = $rootScope.puzzles[$rootScope.puzzleIndex];
-          $rootScope.puzzle.outcome = null;
-          $rootScope.puzzle.hints = $rootScope.shuffle($rootScope.hints);
-          $rootScope.zoom($rootScope.puzzle.hints[0]);
-        }
-
-        $rootScope.zoom = function(hint) {
-          $rootScope.zoomedHint = hint;
-        }
-
-        $rootScope.verifyGuess = function() {
-          if($rootScope.guess.length == 3) {
-            $rootScope.puzzle.outcome = ($rootScope.guess.toLowerCase() == $rootScope.puzzle.answer) ? 'right' : 'wrong'
-          }
-        }
-
-        $rootScope.nextPuzzle();
-      });
-    </script>
-  </body>
+  <script src="vendor/angular/1.2.13/angular.min.js"></script>
+  <script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
+      typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
+    b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
+  mixpanel.init("215fbe2ef1030c1e800e2bc784b8f849");</script>
+  <script src="src/quizApp.js"></script>
+  <!--script src="https://mixpanel.com/api/2.0/segmentation?callback=console.log&api_key=e998c27557f0d0f4a1ce751dcc2b09f6&event=Guess&expire=1425493293&format=json&on=properties%5B%22answer%22%5D+%2B+%22%2F%22+%2B+properties%5B%22guess%22%5D&sig=08544f70496e5795c63d948c718b8592&unit=month&where=properties%5B%22outcome%22%5D+%3D%3D+false"></script-->
+</body>
 </html>
