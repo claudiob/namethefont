@@ -13,6 +13,7 @@
     .small img {width: 30px; height: 30px; margin-left: 3px; margin-right: 3px; cursor: -webkit-zoom-in; cursor: -moz-zoom-in; cursor: zoom-in;}
     .small img:hover, .small img:focus {border-color: #aaa}
     .small img.active, .big img {border-color: #777;}
+    .outcome {margin-top: 1em}
     .outcome.right {color: #0a0}
     .outcome.wrong {color: #a00}
     .score {float: left}
@@ -70,7 +71,7 @@
   <form>
     <label>
       Name the font:
-      <input type="text" autofocus ng-model="guess" ng-disabled="isGuessed(quiz)" size="3" />
+      <input type="text" autofocus="autofocus" autocorrect='off' autocapitalize='off' ng-model="guess" ng-disabled="isGuessed(quiz)" data-ntf-focus="!isGuessed(quiz)" size="3" />
     </label>
 
     <div class="outcome" ng-show="isGuessed(quiz)" ng-cloak ng-class='{right: isRight(quiz), wrong: isWrong(quiz)}'>
@@ -79,7 +80,7 @@
       it’s {{ quiz.name }}! <br />
     </div>
 
-    <input type="submit" ng-cloak ng-show="isGuessed(quiz) && !quizzes.over()" ng-click='quizzes.next()' value="Try another one" />
+    <input type="submit" ng-cloak ng-show="isGuessed(quiz) && !quizzes.over()" data-ntf-focus="isGuessed(quiz) && !quizzes.over()" ng-click='quizzes.next()' value="Try another one" />
     <div ng-cloak ng-show="isGuessed(quiz) && quizzes.over()">GAME OVER! :)</div>
   </form>
 

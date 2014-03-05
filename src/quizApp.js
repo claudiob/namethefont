@@ -398,6 +398,18 @@ quizApp.factory('Hints', function() {
   'Qq', 'Rr', 'Ss', 'Tt', 'Uu', 'Vv', 'Ww', 'Xx', 'Yy', 'Zz', '12', '34', '56', '78', '90'];
 });
 
+quizApp.directive('ntfFocus', [function () {
+  return function focusIf(scope, element, attr) {
+    scope.$watch(attr.ntfFocus, function (newVal) {
+      if (newVal) {
+        scope.$evalAsync(function() {
+            element[0].focus();
+        });
+      }
+    });
+  }
+}]);
+
 function QuizCtrl($scope, $interval, Quizzes, Hints) {
   function shuffle(array){
     for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
