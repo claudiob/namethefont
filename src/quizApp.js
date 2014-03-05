@@ -403,7 +403,9 @@ quizApp.directive('ntfFocus', [function () {
     scope.$watch(attr.ntfFocus, function (newVal) {
       if (newVal) {
         scope.$evalAsync(function() {
+          if(!(navigator.userAgent.match(/iPhone/i)) && !(navigator.userAgent.match(/iPod/i))) {
             element[0].focus();
+          }
         });
       }
     });
