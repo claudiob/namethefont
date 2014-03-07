@@ -23,30 +23,6 @@
     .timer .ticked {background-color: #ccc}
     .score div, .timer div  {width: 4px; height: 4px; border: 1px solid silver; margin-bottom: 0}
     [ng-cloak] {display: none !important;}
-    .animate-show, .animate-hide {
-      -webkit-transition: opacity 1s ease-in-out;
-      -moz-transition: opacity 1s ease-in-out;
-      -ms-transition: opacity 1s ease-in-out;
-      -o-transition: opacity 1s ease-in-out;
-      transition: opacity 1s ease-in-out;
-    }
-
-    .my-repeat-animation.ng-enter.ng-enter-active,
-    .my-repeat-animation.ng-leave {
-      opacity: 1;
-      -webkit-transition: opacity 300ms linear;
-      -moz-transition: opacity 300ms linear;
-      transition: opacity 300ms linear;
-    }
-
-    /* Remove animation */
-    .my-repeat-animation.ng-leave.ng-leave-active,
-    .my-repeat-animation.ng-enter {
-      opacity: 0;
-      -webkit-transition: opacity 300ms linear;
-      -moz-transition: opacity 300ms linear;
-      transition: opacity 300ms linear;
-    }
   </style>
 </head>
 <body ng-app="quizApp" ng-controller="QuizCtrl">
@@ -57,7 +33,7 @@
     <div ng-repeat='t in ticks() track by $index' ng-class='{ticked: $index < tick}'></div>
   </div>
 
-  <div class='big' class="my-repeat-animation">
+  <div class='big'>
     <img src="hints/blank.gif" ng-src='{{ quiz.hint }}' id='big'/>
   </div>
 
