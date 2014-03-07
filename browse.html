@@ -1,0 +1,119 @@
+ <!DOCTYPE html>
+<html lang='en' ng-app="fontragApp">
+<head>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
+  <title>Browse fonts at fontrag.com</title>
+  <style>
+    [ng-cloak] {display: none !important;}
+    li {list-style: none; float: left; margin: 5px}
+  </style>
+</head>
+<body ng-controller="BrowseCtrl as browser">
+
+  <label>By typeface: <input type="text" ng-model="search.font.name" /></label>
+  <label>By glyph: <input type="text" ng-model="search.glyph" /></label>
+
+  <ul>
+    <li ng-repeat='char in browser.chars | filter:search' rag-view='chars/show' rag-item='char'></li>
+  </ul>
+
+  <noscript>
+    <p>Please enable Javascript to experience this website</p>
+  </noscript>
+
+  <script src="vendor/angular/1.2.13/angular.min.js"></script>
+  <script>
+  var app = angular.module('fontragApp', []);
+
+  app.factory('Fonts', function() { return [
+    {name: 'Akzidenz Grotesk', publisher: 'Berthold', year: 1896, designer: 'Günter Gerhard Lange', style: 'Std Regular'},
+    {name: 'American Typewriter', publisher: 'ITC', year: 1974, designer: 'Joel Kaden and Tony Stan', style: 'Std Medium'},
+    {name: 'Avant Garde Gothic', publisher: 'ITC', year: 1974, designer: 'Herb Lubalin and Tom Carnase', style: 'Std Book'},
+    {name: 'Antique Olive', publisher: 'Linotype', year: 1962, designer: 'Roger Excoffon', style: 'Roman'},
+    {name: 'Arial', publisher: 'Monotype', year: 1982, designer: 'Robin Nicholas and Patricia Saunders', style: 'Std Regular'},
+    {name: 'Archer', publisher: 'Hoefler & Frere-Jones', year: 2007, designer: 'Jonathan Hoefler and Tobias Frere-Jones', style: 'Book'},
+    {name: 'Avenir', publisher: 'Linotype', year: 1988, designer: 'Adrian Frutiger', style: '55 Roman'},
+    {name: 'Bank Gothic', publisher: 'Bitstream', year: 1930, designer: 'Morris Fuller Benton', style: '55 Roman'},
+    {name: 'Baskerville', publisher: 'Bitstream', year: 1757, designer: 'John Baskerville', style: 'Roman'},
+    {name: 'Bodoni', publisher: 'Linotype', year: 1767, designer: 'Giambattista Bodoni', style: 'Roman'},
+    {name: 'Brandon Grotesque', publisher: 'HVD Fonts', year: 2009, designer: 'Hannes von Döhren', style: 'Regular'},
+    {name: 'Caslon', publisher: 'Linotype', year: 1725, designer: 'William Caslon', style: 'Regular'},
+    {name: 'Century Gothic', publisher: 'Monotype', year: 1959, designer: 'Sol Hess', style: 'Std Regular'},
+    {name: 'Clarendon', publisher: 'Bitstream', year: 1845, designer: 'Edouard Hoffmann and Hermann Eidenbenz', style: ''},
+    {name: 'Comic Sans', publisher: 'Ascender', year: 1995, designer: 'Vincent Connare', style: ''},
+    {name: 'Cooper Black', publisher: 'Linotype', year: 1922, designer: 'Oswald Bruce Cooper', style: ''},
+    {name: 'Copperplate Gothic', publisher: 'Bitstream', year: 1905, designer: 'Frederic W. Goudy', style: ''},
+    {name: 'Dax', publisher: 'FontFont', year: 1995, designer: 'Hans Reichel', style: 'FF Dax Pro Regular'},
+    {name: 'Didot', publisher: 'Adobe', year: 1783, designer: 'Firmin Didot', style: 'LT Std Roman'},
+    {name: 'Din', publisher: 'FontFont', year: 1995, designer: 'Albert-Jan Pool', style: 'FF Din Pro'},
+    {name: 'Eurostile', publisher: 'Linotype', year: 1962, designer: 'Aldo Novarese', style: ''},
+    {name: 'Franklin Gothic', publisher: 'ITC', year: 1902, designer: 'Morris Fuller Benton', style: 'Std Book'},
+    {name: 'Frutiger', publisher: 'URW++', year: 1968, designer: 'Adrian Frutiger', style: '55 Roman'},
+    {name: 'Futura', publisher: 'Linotype', year: 1932, designer: 'Paul Renner', style: 'Medium'},
+    {name: 'Garamond', publisher: 'Linotype', year: 1495, designer: 'Claude Garamond', style: 'Adobe Garamond Regular'},
+    {name: 'Georgia', publisher: 'Ascender', year: 1996, designer: 'Matthew Carter', style: ''},
+    {name: 'Gill Sans', publisher: 'Monotype', year: 1928, designer: 'Eric Gill', style: ''},
+    {name: 'Gotham', publisher: 'Hoefler & Frere-Jones', year: 2000, designer: 'Jonathan Hoefler and Tobias Frere-Jones', style: 'Book'},
+    {name: 'Helvetica', publisher: 'Adobe', year: 1957, designer: 'Max Miedinger', style: 'Roman'},
+    {name: 'Interstate', publisher: 'Font Bureau', year: 1993, designer: 'Tobias Frere-Jones', style: 'Regular'},
+    {name: 'Johnston', publisher: 'P22', year: 1916, designer: 'Edward Johnston', style: 'P22 Johnston Underground'},
+    {name: 'Kabel', publisher: 'Linotype', year: 1928, designer: 'Rudolf Koch', style: 'Book'},
+    {name: 'Lucida Sans', publisher: 'Adobe', year: 1985, designer: 'Charles Bigelow and Kris Holmes', style: 'Roman'},
+    {name: 'Minion', publisher: 'Adobe', year: 1990, designer: 'Robert Slimbach', style: 'Pro Regular'},
+    {name: 'Mistral', publisher: 'Adobe', year: 1953, designer: 'Roger Excoffon', style: 'Std'},
+    {name: 'Museo', publisher: 'exljbris', year: 2008, designer: 'Jos Buivenga', style: '300'},
+    {name: 'Myriad', publisher: 'Adobe', year: 1992, designer: 'Robert Slimbach', style: 'Pro Regular'},
+    {name: 'News Gothic', publisher: 'Adobe', year: 1908, designer: 'Morris Fuller Benton', style: 'Pro Regular'},
+    {name: 'Optima', publisher: 'Linotype', year: 1958, designer: 'Hermann Zapf', style: ''},
+    {name: 'Palatino', publisher: 'Linotype', year: 1986, designer: 'Hermann Zapf', style: 'Roman'},
+    {name: 'Proxima Nova', publisher: 'Mark Simonson', year: 2005, designer: 'Mark Simonson', style: 'Regular'},
+    {name: 'Rockwell', publisher: 'Monotype', year: 1934, designer: 'Frank Hinman Pierpont', style: 'Std'},
+    {name: 'Rotis', publisher: 'Monotype', year: 1988, designer: 'Otl Aicher', style: 'Sans Serif'},
+    {name: 'Times New Roman', publisher: 'Monotype', year: 1931, designer: 'Victor Lardent', style: 'Std Regular'},
+    {name: 'Trade Gothic', publisher: 'Linotype', year: 1948, designer: 'Jackson Burke', style: ''},
+    {name: 'Univers', publisher: 'Linotype', year: 1957, designer: 'Adrian Frutiger', style: '55 Roman'},
+    {name: 'Verdana', publisher: 'Ascender', year: 1996, designer: 'Matthew Carter', style: ''}
+  ]});
+
+  app.factory('Glyphs', function() { return [
+    'Aa', 'Bb', 'Cc', 'Dd', 'Ee', 'Ff', 'Gg', 'Hh', 'Ii', 'Jj', 'Kk', 'Ll', 'Mm', 'Nn', 'Oo', 'Pp',
+    'Qq', 'Rr', 'Ss', 'Tt', 'Uu', 'Vv', 'Ww', 'Xx', 'Yy', 'Zz', '12', '34', '56', '78', '90',
+  ]});
+
+  app.directive('ragView', function($window) {
+    return {
+      scope: {item: '=ragItem'},
+      link: function(scope, element, attrs) {
+        if(typeof($window.ragStylesheets) == 'undefined')
+          $window.ragStylesheets = [];
+        if($window.ragStylesheets.indexOf(attrs.ragView) < 0) {
+          angular.element(document).find('head').append('<link rel="stylesheet" href="views/' + attrs.ragView + '.css" rag-style="' + attrs.ragView + '" />');
+          $window.ragStylesheets.push(attrs.ragView);
+        }
+      },
+      templateUrl: function(tElement, tAttrs) {return "views/" + tAttrs.ragView + ".html"}
+    };
+  });
+
+  app.directive('ragToggleClassOnClick', function() {
+    return function(scope, element, attrs) {
+      element.on('click', function(event) {
+        scope.toggled = !scope.toggled;
+        scope.toggled ? element.addClass(attrs.ragToggleClassOnClick) :  element.removeClass(attrs.ragToggleClassOnClick);
+      })
+    }
+  });
+
+  app.controller('BrowseCtrl', function($scope, Fonts, Glyphs) {
+    this.chars = [].concat.apply([], Fonts.map(function(font) {
+      font.shortName = font.name.substring(0,3).toLowerCase();
+      return Glyphs.map(function(glyph) {
+        var url = "hints/" + font.shortName + "/" + glyph + ".gif";
+        return {font: font, glyph: glyph, url: url}
+      })
+    }));
+  })
+  </script>
+</body>
+</html>
